@@ -2,6 +2,7 @@
 
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { fetchConversation, fetchConversations, markMessagesAsRead, sendMessage } from "../thunk/chatThunk";
+// import { setSelected } from "./selectedphotosSlice";
 
 interface User {
   id: string;
@@ -16,6 +17,8 @@ interface Message {
   sent_at: string;
   sender: User;
   receiver: User;
+   timestamp: string;
+  read?: boolean;
 }
 
 interface Conversation {
@@ -28,7 +31,7 @@ interface ChatState {
   conversations: Conversation[];
   messages: Message[];
   selectedUser: User | null;
-  // selectedUser: Partial<UserListItem> | null;
+
   loading: boolean;
   error: string | null;
 }
@@ -36,7 +39,7 @@ interface ChatState {
 const initialState: ChatState = {
   conversations: [],
   messages: [],
-  selectedUser: null,
+ selectedUser: null,
   loading: false,
   error: null,
 };
@@ -45,13 +48,36 @@ const chatSlice = createSlice({
   name: "chat",
   initialState,
   reducers: {
+    setSelectedUser: (state, action: PayloadAction<User | null>) => {
+      state.selectedUser = action.payload;
+    },
+    setConversations: (state, action: PayloadAction<Conversation[]>) => {
+      state.conversations = action.payload;
+    },
+    setMessages: (state, action: PayloadAction<Message[]>) => {
+        // remove duplicates
+      const uniqueMessages = Array.from(new Map(action.payload.map(m => [m.id, m])).values());
+      state.messages = uniqueMessages;
+    },
+    clearChat: (state) => {
+      state.conversations = [];
+      state.messages = [];
+      state.selectedUser = null;
+    },
+  
     clearConversations: (state) => {
       state.conversations = [];
       state.error = null;
     },
-    setSelectedUser: (state, action: PayloadAction<User | null>) => {
-      state.selectedUser = action.payload;
-      console.log("chatSlice - setSelectedUser:", action.payload); // Debug
+     // 🚀 handle incoming socket message
+    messageReceived: (state, action: PayloadAction<Message>) => {
+       const incomingMessage = action.payload;
+
+      // ✅ Check for duplicate before adding
+      const exists = state.messages.find((msg) => msg.id === incomingMessage.id);
+      if (!exists) {
+        state.messages.push(incomingMessage);
+      }
     },
   },
   extraReducers: (builder) => {
@@ -126,5 +152,6 @@ const chatSlice = createSlice({
   },
 });
 
-export const { clearConversations, setSelectedUser } = chatSlice.actions;
+export const { clearConversations, setSelectedUser,setMessages,clearChat ,setConversations,messageReceived} = chatSlice.actions;
 export default chatSlice.reducer;
+

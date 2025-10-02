@@ -3,7 +3,7 @@
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import Image from "next/image";
-import { Skeleton } from "./ui/skeleton";
+import { Skeleton } from "../ui/skeleton";
 import { useState } from "react";
 import { CheckCircle2 } from "lucide-react";
 
@@ -41,7 +41,9 @@ export default function TripPhotos({
   }
 
   if (!photos || photos.length === 0) {
-    return <div className="text-center text-gray-400">No photos uploaded yet.</div>;
+    return (
+      <div className="text-center text-gray-400">No photos uploaded yet.</div>
+    );
   }
 
   return (
@@ -54,11 +56,15 @@ export default function TripPhotos({
             key={photo.id || index}
             className={`relative rounded-xl overflow-hidden ${
               selectable ? "cursor-pointer" : ""
-            } ${isSelected ? "border-4 border-green-700" : "border-transparent"}`}
+            } ${
+              isSelected ? "border-4 border-green-700" : "border-transparent"
+            }`}
             onClick={() => selectable && toggleSelect(photo.id)}
           >
             <Image
-              src={photo.url || `http://localhost:8080/photos/${photo.filename}`}
+              src={
+                photo.url || `http://localhost:8080/photos/${photo.filename}`
+              }
               alt={photo.caption || "Trip Photo"}
               width={400}
               height={400}
@@ -74,7 +80,9 @@ export default function TripPhotos({
             )}
 
             {photo.caption && (
-              <p className="mt-1 text-sm text-gray-700 text-center">{photo.caption}</p>
+              <p className="mt-1 text-sm text-gray-700 text-center">
+                {photo.caption}
+              </p>
             )}
           </div>
         );

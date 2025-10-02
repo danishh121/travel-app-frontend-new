@@ -23,6 +23,7 @@ export type Profile = {
   id: string;
   name: string;
   profilePic: string | null;
+   profile_pic_url: string | null;
   bio: string;
   email: string;
   homeLocation: HomeLocation;

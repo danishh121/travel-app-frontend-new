@@ -18,6 +18,8 @@ interface Message {
   sent_at: string;
   sender: User;
   receiver: User;
+   timestamp: string;
+  read?: boolean;
 }
 
 interface Conversation {
@@ -61,6 +63,43 @@ export const fetchConversations = createAsyncThunk<
     }
   }
 );
+
+
+// export const fetchConversations = createAsyncThunk<
+//   Conversation[], // return type of thunk
+//   { page?: number; limit?: number }, // argument type
+//   { state: RootState; rejectValue: string } // thunkAPI type
+// >(
+//   "chat/fetchConversations",
+//   async ({ page = 1, limit = 20 }, { getState, rejectWithValue }) => {
+//     try {
+//       const token = (getState() as RootState).auth.token || localStorage.getItem("token");
+//       if (!token) return rejectWithValue("No token found");
+
+//       const res = await api.get(`/chat/conversations?page=${page}&limit=${limit}`, {
+//         headers: { Authorization: `Bearer ${token}` },
+//       });
+
+//       const raw: any[] = res.data.data || [];
+
+//       // MAP API response to your Conversation type
+//       const conversations: Conversation[] = raw.map((c: any) => ({
+//         otherUser: c.otherUser,
+//         messages: c.messages || [], // <-- ensure messages always exist
+//         lastMessage: c.lastMessage || (c.messages && c.messages[c.messages.length - 1]) || null,
+//         unreadCount: c.unreadCount || 0,
+//       }));
+
+//       // Deduplicate by otherUser.id
+//       const unique = Array.from(new Map(conversations.map(c => [c.otherUser.id, c])).values());
+
+//       return unique;
+//     } catch (err: any) {
+//       return rejectWithValue(err.response?.data?.message || "Failed to fetch conversations");
+//     }
+//   }
+// );
+
 
 export const fetchConversation = createAsyncThunk<
   Message[],
@@ -150,5 +189,91 @@ export const markMessagesAsRead = createAsyncThunk<
     }
   }
 );
+
+export const deleteMessage = createAsyncThunk<
+  string, // return messageId on success
+  { messageId: string },
+  { state: RootState; rejectValue: string }
+>(
+  "chat/deleteMessage",
+  async ({ messageId }, { getState, rejectWithValue }) => {
+    try {
+      const state = getState() as RootState;
+      const token = state.auth.token || localStorage.getItem("token");
+
+      if (!token) {
+        return rejectWithValue("No token found. Please log in.");
+      }
+
+      const res = await api.delete(`/chat/message/${messageId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      console.log("deleteMessage response:", res.data);
+      return messageId;
+    } catch (err: any) {
+      console.error("deleteMessage error:", err);
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to delete message"
+      );
+    }
+  }
+);
+
+
+// Search messages
+export const searchMessages = createAsyncThunk<
+  Message[],
+  { query: string; page?: number; limit?: number },
+  { state: RootState; rejectValue: string }
+>(
+  "chat/searchMessages",
+  async ({ query, page = 1, limit = 20 }, { getState, rejectWithValue }) => {
+    try {
+      const token = (getState() as RootState).auth.token || localStorage.getItem("token");
+      if (!token) return rejectWithValue("No token found. Please log in.");
+
+      const res = await api.get(`/chat/search?query=${query}&page=${page}&limit=${limit}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+    console.log(res)
+      return res.data.data || [];
+    } catch (err: any) {
+      return rejectWithValue(err.response?.data?.message || "Failed to search messages");
+    }
+  }
+);
+
+// Fetch online users
+export const fetchOnlineUsers = createAsyncThunk<
+  User[], // return list of users
+  { page?: number; limit?: number },
+  { state: RootState; rejectValue: string }
+>(
+  "chat/fetchOnlineUsers",
+  async ({ page = 1, limit = 20 }, { getState, rejectWithValue }) => {
+    try {
+      const token = (getState() as RootState).auth.token || localStorage.getItem("token");
+
+      if (!token) {
+        return rejectWithValue("No token found. Please log in.");
+      }
+
+      const res = await api.get(`/chat/online-users?page=${page}&limit=${limit}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      console.log("fetchOnlineUsers response:", res.data);
+
+      // API returns { users: [...], totalCount }
+      return res.data.data?.users || [];
+    } catch (err: any) {
+      console.error("fetchOnlineUsers error:", err);
+      return rejectWithValue(err.response?.data?.message || "Failed to fetch online users");
+    }
+  }
+);
+
+
 
 

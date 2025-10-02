@@ -4,7 +4,7 @@ import React from "react";
 import { Home, Users, Heart, LayoutDashboard } from "lucide-react";
 import { Card, CardContent } from "./card";
 import Link from "next/link";
-import UserProfileIcon from "../UserProfileIcon";
+import UserProfileIcon from "../edit_profile/UserProfileIcon";
 
 import { useRouter } from "next/navigation";
 

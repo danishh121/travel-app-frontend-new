@@ -6,7 +6,7 @@ import Link, { useRouter, useParams } from "next/navigation";
 import Footer from "@/components/ui/Footer";
 import { SmartImage } from "@/components/ui/SmartImage";
 import { Skeleton } from "@/components/ui/skeleton";
-import EditProfileForm from "@/components/EditProfile";
+import EditProfileForm from "@/components/edit_profile/EditProfile";
 import { MoreVertical } from "lucide-react";
 import {
   Dialog,
@@ -25,7 +25,7 @@ import {
 } from "@/redux/thunk/feedThunk";
 import { IoIosArrowBack } from "react-icons/io";
 import { FcPlus } from "react-icons/fc";
-import UploadProfilePic from "@/components/UploadProfilePic";
+import UploadProfilePic from "@/components/edit_profile/UploadProfilePic";
 import {
   Sheet,
   SheetContent,

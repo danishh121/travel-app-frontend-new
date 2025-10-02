@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchMyTrips, startTrip } from "@/redux/thunk/tripsThunk";
 import { Button } from "@/components/ui/button";
-import TripCard from "@/components/TripCard";
+import TripCard from "@/components/trip/TripCard";
 
 import { RootState } from "@/redux/store";
 import {
@@ -18,39 +18,41 @@ import {
 } from "@/components/ui/dialog";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { useRouter } from "next/navigation";  
-import { Skeleton } from "@/components/ui/skeleton"
-
+import { useRouter } from "next/navigation";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function TripsPage() {
   const dispatch = useDispatch<any>();
-   const router = useRouter();
-  const { list: trips, loading, error,pagination} = useSelector((state: any) => state.trips);
-  const { user} = useSelector((state: any) => state.user);
-  
+  const router = useRouter();
+  const {
+    list: trips,
+    loading,
+    error,
+    pagination,
+  } = useSelector((state: any) => state.trips);
+  const { user } = useSelector((state: any) => state.user);
+
   // const { user } = useSelector((state: any) => state.user);
   const [tripName, setTripName] = useState("");
   const [tripDesc, setTripDesc] = useState("");
   const [open, setOpen] = useState(false);
   const [starting, setStarting] = useState(false);
-   // ✅ prevent double fetch in dev
+  // ✅ prevent double fetch in dev
   const [page, setPage] = useState(1);
-const effectRan = useRef(false);
-// ✅ Load first page only on mount
-useEffect(() => {
-  if (effectRan.current) return; // ✅ prevent 2nd run in dev
-  effectRan.current = true;
+  const effectRan = useRef(false);
+  // ✅ Load first page only on mount
+  useEffect(() => {
+    if (effectRan.current) return; // ✅ prevent 2nd run in dev
+    effectRan.current = true;
     dispatch(fetchMyTrips({ page: 1, limit: 10 }));
-   
-  
-}, [dispatch, router]);
+  }, [dispatch, router]);
 
-// ✅ Load more only if page > 1
-useEffect(() => {
-  if (page > 1) {
-    dispatch(fetchMyTrips({ page, limit: 10 }));
-  }
-}, [page, dispatch]);
+  // ✅ Load more only if page > 1
+  useEffect(() => {
+    if (page > 1) {
+      dispatch(fetchMyTrips({ page, limit: 10 }));
+    }
+  }, [page, dispatch]);
 
   // ✅ Infinite scroll listener
   useEffect(() => {
@@ -58,8 +60,7 @@ useEffect(() => {
       if (loading || !pagination?.hasNextPage) return;
 
       const nearBottom =
-        window.innerHeight + window.scrollY >=
-        document.body.offsetHeight - 300;
+        window.innerHeight + window.scrollY >= document.body.offsetHeight - 300;
 
       // prevent auto-fetch if content is shorter than screen
       if (nearBottom && document.body.offsetHeight > window.innerHeight) {
@@ -71,30 +72,30 @@ useEffect(() => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [loading, pagination]);
   const handleStartTrip = async () => {
-  try {
-    setStarting(true);
+    try {
+      setStarting(true);
 
-    // ✅ unwrap gives you the created trip object
-    const newTrip = await dispatch(
-      startTrip({ name: tripName, description: tripDesc })
-    ).unwrap();
+      // ✅ unwrap gives you the created trip object
+      const newTrip = await dispatch(
+        startTrip({ name: tripName, description: tripDesc })
+      ).unwrap();
 
-    setOpen(false);
-    setTripName("");
-    setTripDesc("");
+      setOpen(false);
+      setTripName("");
+      setTripDesc("");
 
-    // ✅ redirect to new trip detail page
-    router.push(`/trips/${newTrip.id}`);
-  } catch (err) {
-    console.error("Start trip failed:", err);
-  } finally {
-    setStarting(false);
-  }
-};
+      // ✅ redirect to new trip detail page
+      router.push(`/trips/${newTrip.id}`);
+    } catch (err) {
+      console.error("Start trip failed:", err);
+    } finally {
+      setStarting(false);
+    }
+  };
 
   // const handleStartTrip = async () => {
   //   try {
-      
+
   //     setStarting(true);
   //     await dispatch(
   //       startTrip({ title: tripName, description: tripDesc })
@@ -110,7 +111,7 @@ useEffect(() => {
   // };
 
   return (
-  <div className="flex items-center justify-center min-h-screen bg-gradient-to-br bg-green-50 px-2 sm:px-4">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br bg-green-50 px-2 sm:px-4">
       <Card className="w-full max-w-xl shadow-lg rounded-2xl border mb-20 bg-green-100 relative pl-3 pr-3">
         {/* 🔹 Loading skeleton */}
         {loading && trips.length === 0 ? (
@@ -122,12 +123,15 @@ useEffect(() => {
         ) : (
           <>
             {/* 🔹 Error */}
-            {error && <div className="p-6 text-center text-red-500">{error}</div>}
+            {error && (
+              <div className="p-6 text-center text-red-500">{error}</div>
+            )}
 
             {/* 🔹 No trips */}
             {!error && trips.length === 0 && (
               <div className="p-6 text-center text-gray-700">
-                Welcome <span className="font-semibold">{user?.name}</span>!<br />
+                Welcome <span className="font-semibold">{user?.name}</span>!
+                <br />
                 You don’t have any trips yet. Start your first trip below.
               </div>
             )}
@@ -138,7 +142,10 @@ useEffect(() => {
                 <div className="mb-3 mt-6 ml-5">
                   <h1 className="text-lg font-medium">
                     Welcome{" "}
-                    <span className="text-green-600 text-2xl"> {user?.name}</span>
+                    <span className="text-green-600 text-2xl">
+                      {" "}
+                      {user?.name}
+                    </span>
                   </h1>
                 </div>
 
@@ -210,7 +217,6 @@ useEffect(() => {
                 </Dialog>
               </div>
             </div>
-   
           </>
         )}
       </Card>

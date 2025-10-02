@@ -8,6 +8,7 @@ export interface UserListItem {
   id: string;
   name: string;
   profile_pic_url: string | null;
+  online?: boolean;
   bio: string | null;
   followersCount: number;
   followingCount: number;

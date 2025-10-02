@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState, Suspense, useRef } from "react";
@@ -9,7 +8,7 @@ import { fetchTripPhotos } from "@/redux/thunk/photoThunk";
 import { fetchTripById } from "@/redux/thunk/tripsThunk";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import TripPhotos from "@/components/TripPhotos";
+import TripPhotos from "@/components/trip/TripPhotos";
 
 export default function AnimationPageContent() {
   const searchParams = useSearchParams();
@@ -21,10 +20,10 @@ export default function AnimationPageContent() {
   const { currentTrip } = useSelector((state: RootState) => state.trips);
 
   const [selectedPhotos, setSelectedPhotos] = useState<string[]>([]);
-const effectRan = useRef(false);
+  const effectRan = useRef(false);
   useEffect(() => {
     if (effectRan.current) return; // ✅ prevent 2nd run in dev
-  effectRan.current = true;
+    effectRan.current = true;
     if (tripId) {
       dispatch(fetchTripById(tripId));
       dispatch(fetchTripPhotos(tripId));
@@ -62,7 +61,9 @@ const effectRan = useRef(false);
                 disabled={selectedPhotos.length === 0}
                 onClick={() =>
                   router.push(
-                    `/animation/animationStyle?tripId=${tripId}&photos=${selectedPhotos.join(",")}`
+                    `/animation/animationStyle?tripId=${tripId}&photos=${selectedPhotos.join(
+                      ","
+                    )}`
                   )
                 }
                 className="bg-green-700 p-4 pl-10 pr-10 hover:bg-green-800"
