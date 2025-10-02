@@ -31,10 +31,9 @@ export default function RootLayout({
 
        <ReduxProvider>
       <SocketProvider>
-       
-        <>
-          {children}
-        </> 
+        
+        {children}
+        
       </SocketProvider>
     </ReduxProvider>
       </body>
